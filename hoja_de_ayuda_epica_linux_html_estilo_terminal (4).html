@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Hoja de Ayuda — Linux Ops (épica)</title>
+<style>
+  :root{
+    --bg:#0a0e12; --panel:#0b0f14; 
+    --ink:#e9fff0; --muted:#b9e6c8;
+    --accent:#39ff14; /* verde fluor principal */
+    --accent-2:#a7ffcf; /* apoyo */
+    --warn:#ffd166; --danger:#ff6b6b; --border:#233042;
+    --card:#0a0f14; --glow:0 0 28px rgba(57,255,20,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:radial-gradient(1300px 900px at 12% -20%, #172232 0%, var(--bg) 45%) fixed;color:var(--ink);font:16px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono","Courier New",monospace}
+  .wrap{max-width:980px;margin:28px auto;padding:0 16px}
+
+  /* Top bar */
+  header{border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));box-shadow:0 18px 40px rgba(0,0,0,.35);padding:16px 18px;display:flex;gap:14px;align-items:center;position:sticky;top:10px;backdrop-filter:blur(3px);z-index:5}
+  .logo{color:var(--accent);text-shadow:var(--glow);font-weight:900}
+  .title{flex:1}
+  h1{font-size:20px;margin:0}
+  .sub{color:var(--muted);font-size:12px;margin-top:2px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+  button{appearance:none;border:1px solid var(--border);background:#0f1a24;color:#dfffee;border-radius:10px;padding:8px 12px;cursor:pointer}
+  .primary{background:var(--accent);color:#062a1f;border:0;font-weight:800;box-shadow:0 0 18px rgba(0,208,132,.25)}
+
+  /* Cards */
+  .grid{display:grid;gap:14px;margin-top:16px}
+  @media(min-width:960px){ .grid.cols-2{grid-template-columns:1fr 1fr} }
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--glow)}
+  .card h2{margin:0 0 10px;font-size:16px;color:#eafbf5}
+  .call{border-left:4px solid var(--accent);padding:10px 12px;background:rgba(0,208,132,.08);border-radius:10px}
+
+  /* Terminal blocks */
+  .term{background:#060a0f;border:1px solid #263146;border-radius:14px;padding:12px;box-shadow:var(--glow)}
+  .term .bar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .r{background:#ff5f56}.y{background:#ffbd2e}.g{background:#27c93f}
+  .prompt{color:#a7ffcf}
+  pre{margin:0;overflow:auto}
+  code{color:#d8fff0}
+
+  .tip{color:var(--muted);font-size:12px}
+  .kbd{border:1px solid #2a3547;border-bottom-width:3px;border-radius:8px;padding:.05em .35em;background:#0d1521;color:#a7ffcf}
+
+  footer{margin:18px 0;color:var(--muted);font-size:12px;text-align:center}
+
+  /* Print */
+  @page{ size: A4 portrait; margin: 10mm }
+  @page{ size: A4 portrait; margin: 10mm }
+  @media print{
+    /* A4 negro: el papel aporta el fondo. Solo imprimimos trazos/texto en verde fluor */
+    html, body{ background:transparent !important; color:#39ff14 !important; font-size:12pt; line-height:1.38; letter-spacing:.12px }
+    .wrap{ max-width: 100%; margin:0; padding:0 }
+
+    h1{ color:#7dff80 !important; font-weight:900; letter-spacing:.8px; text-transform:uppercase; border-bottom:1pt solid #39ff14; padding-bottom:2mm; margin-bottom:3mm }
+    h2{ color:#7dff80 !important; border-left:3pt solid #39ff14; padding-left:4mm; margin:6mm 0 3mm }
+    strong, code{ color:#eaffee !important }
+    .sub, .tip, li, p{ color:#caffe0 !important }
+    .logo, .prompt{ color:#39ff14 !important; text-shadow:none !important }
+
+    header, .card, .term{ box-shadow:none !important; background:transparent !important }
+    header{ border:1pt solid #39ff14 !important; position:static; padding:6mm }
+    .card, .term{ border:0.9pt solid #39ff14 !important; page-break-inside: avoid; margin:7mm 0; padding:7mm }
+    .term .bar .dot{ display:none }
+
+    .ascii-banner{ color:#7dff80 !important }
+    pre, code{ color:#eaffee !important; background:transparent !important; overflow:visible; white-space:pre-wrap }
+    .toolbar{ display:none !important }
+
+    a{ color:#7dff80 !important; text-decoration:none }
+    footer{ color:#7dff80 !important; border-top:0.8pt dashed #39ff14; padding-top:3mm; margin-top:5mm }
+  }
+    .wrap{ max-width: 100%; margin:0; padding:0 }
+
+    /* Tipografías & colores alto contraste para papel oscuro */
+    h1{ color:#b9ffe0 !important; font-weight:900; letter-spacing:.6px; text-transform:uppercase; border-bottom:1.2pt solid #e8fff4; padding-bottom:2mm; margin-bottom:2mm }
+    h2{ color:#a7ffcf !important; border-left:3pt solid #a7ffcf; padding-left:4mm; margin:6mm 0 3mm }
+    strong, code{ color:#ffffff !important }
+    .sub, .tip, li, p{ color:#f1fff8 !important }
+    .logo, .prompt{ color:#a7ffcf !important; text-shadow:none !important }
+
+    /* Quitar efectos y rellenos para no gastar tinta */
+    header, .card, .term{ box-shadow:none !important; background:transparent !important }
+
+    /* Bordes y divisores en claro (trazo fino) */
+    header{ border:1.1pt solid #e8fff4 !important; position:static; padding:6mm }
+    .card, .term{ border:0.9pt solid #e8fff4 !important; page-break-inside: avoid; margin:7mm 0; padding:7mm }
+    .term .bar .dot{ display:none }
+
+    /* Bloques decorativos estilo manual */
+    .ascii-banner{ color:#b9ffe0 !important }
+
+    /* Código sin fondo, texto claro y mono espaciado visible */
+    pre, code{ color:#ffffff !important; background:transparent !important; overflow:visible; white-space:pre-wrap }
+
+    /* Ocultar UI no necesaria */
+    .toolbar{ display:none !important }
+
+    a{ color:#b9ffe0 !important; text-decoration:none }
+    footer{ color:#e8fff4 !important; border-top:0.8pt dashed #e8fff4; padding-top:3mm; margin-top:5mm }
+  }
+    .wrap{ max-width: 100%; margin:0; padding:0 }
+
+    /* Tipografías & colores alto contraste para papel oscuro */
+    h1,h2,strong,code{ color:#a7ffcf !important }
+    .sub, .tip, li, p{ color:#f1fff8 !important }
+    .logo, .prompt{ color:#a7ffcf !important; text-shadow:none !important }
+
+    /* Quitar efectos y rellenos para no gastar tinta */
+    header, .card, .term{ box-shadow:none !important; background:transparent !important }
+
+    /* Bordes y divisores en claro (trazo fino) */
+    header{ border:1.1pt solid #e8fff4 !important; position:static }
+    .card, .term{ border:0.9pt solid #e8fff4 !important; page-break-inside: avoid; margin:7mm 0; padding:8mm }
+    .term .bar .dot{ display:none }
+
+    /* Código sin fondo, texto claro */
+    pre, code{ color:#ffffff !important; background:transparent !important; overflow:visible; white-space:pre-wrap }
+
+    /* Ocultar UI no necesaria */
+    .toolbar{ display:none !important }
+
+    /* Enlaces sin subrayado para estética manual */
+    a{ color:#a7ffcf !important; text-decoration:none }
+
+    footer{ color:#e8fff4 !important; border-top:0.8pt dashed #e8fff4; padding-top:3mm; margin-top:5mm }
+  }
+    header, .card, .term{box-shadow:none}
+    header{background:#fff;border:2px solid #000}
+    .card, .term{background:#fff;border:1.5px solid #000;page-break-inside:avoid}
+    .logo,.prompt{color:#000;text-shadow:none}
+    .toolbar{display:none}
+    code{color:#000}
+  }
+@page{ size: A4 portrait; margin: 10mm }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div style="font-size:11px;color:#9db2cf;margin-bottom:6px" class="print-note">Modo impresión: <strong style="color:#a7ffcf">Manual del Sistema · Papel negro (A4)</strong> — sin fondos; texto y trazos claros.</div>
+      <div class="logo">GF ▮</div>
+      <div class="title">
+        <h1>Hoja de ayuda — Linux Ops (recordatorio)</h1>
+        <div class="sub">Contexto: tareas de administración en entorno Linux. Pensar → decidir → validar.</div>
+      </div>
+      <div class="toolbar">
+        <button id="btnPrint" class="primary">Descargar PDF</button>
+      </div>
+    </header>
+
+    <!-- ===== EPIC ASCII BANNER ===== -->
+    <section class="card" aria-hidden="true" style="padding:10px 12px">
+<pre style="margin:0;line-height:1.15;letter-spacing:.5px" class="ascii-banner">███████  ███████ ██      ██ ███████  ██████   ██████  ███████
+██      ██   ██ ██      ██ ██      ██    ██ ██    ██ ██    
+█████   ███████ ██      ██ █████   ██    ██ ██    ██ █████  
+██      ██   ██ ██ ██   ██ ██      ██    ██ ██    ██ ██     
+██      ██   ██ ██  █████  ███████  ██████   ██████  ███████
+</pre>
+      <div class="tip">GF SYS MANUAL v1.0 · “Administración básica de usuarios y grupos” · Estilo Linux</div>
+    </section>
+
+    <main class="grid" style="grid-template-columns:1fr;gap:16px">
+      <!-- Índice compacto -->
+      <section class="card" id="toc" style="padding:12px 14px">
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <a href="#sec1" class="tag" style="border:1px solid var(--accent);padding:6px 10px;border-radius:10px;color:var(--accent)">SEC‑01 CASE</a>
+          <a href="#sec2" class="tag" style="border:1px solid var(--accent);padding:6px 10px;border-radius:10px;color:var(--accent)">SEC‑02 OPS</a>
+          <a href="#sec3" class="tag" style="border:1px solid var(--accent);padding:6px 10px;border-radius:10px;color:var(--accent)">SEC‑03 VALID</a>
+          <a href="#sec4" class="tag" style="border:1px solid var(--accent);padding:6px 10px;border-radius:10px;color:var(--accent)">SEC‑04 FLUJO</a>
+          <a href="#sec5" class="tag" style="border:1px solid var(--accent);padding:6px 10px;border-radius:10px;color:var(--accent)">SEC‑05 ERRORES</a>
+          <a href="#sec6" class="tag" style="border:1px solid var(--accent);padding:6px 10px;border-radius:10px;color:var(--accent)">SEC‑06 CHECK</a>
+          <a href="#sec7" class="tag" style="border:1px solid var(--accent);padding:6px 10px;border-radius:10px;color:var(--accent)">SEC‑07 GLOSARIO</a>
+        </div>
+      </section>
+
+      <!-- SEC‑01: CASE Skeleton -->
+      <section class="card" id="sec1">
+        <h2>SEC‑01 · Esqueleto mínimo de menú con <code>case</code></h2>
+        <div class="term">
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tip">Referencia</span></div>
+<pre><code><span class="prompt">$</span> read -p "Opción: " op
+<span class="prompt">$</span> case "$op" in
+  1)  # acción A ;;
+  2)  # acción B ;;
+  3)  # salir    ;;
+  *)  echo "Opción inválida" ;;
+<span class="prompt">$</span> esac
+</code></pre>
+        </div>
+        <ul class="tip" style="margin-top:8px">
+          <li>Patrones: <code>1</code>, <code>2</code>, <code>3</code>, <code>*</code>.</li>
+          <li>Cada rama cierra con <code>;;</code>. El bloque cierra con <code>esac</code>.</li>
+          <li>Pedí datos dentro de cada rama con <code>read -p</code>.</li>
+        </ul>
+      </section>
+
+      <!-- SEC‑02: Operaciones de administración -->
+      <section class="card" id="sec2">
+        <h2>SEC‑02 · Operaciones típicas de administración</h2>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">
+          <div class="term">
+            <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tip">Grupos</span></div>
+<pre><code><span class="prompt">$</span> sudo groupadd nombre_grupo      # crear grupo
+<span class="prompt">$</span> getent group nombre_grupo       # ver info del grupo
+</code></pre>
+          </div>
+          <div class="term">
+            <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tip">Usuarios</span></div>
+<pre><code><span class="prompt">$</span> sudo useradd -m nombre_usuario   # crear usuario con home
+<span class="prompt">$</span> id nombre_usuario               # verificar usuario
+<span class="prompt">$</span> sudo usermod -aG nombre_grupo nombre_usuario  # agregar a grupo
+</code></pre>
+          </div>
+        </div>
+        <div class="call" style="margin-top:10px">Naming: minúsculas, sin espacios. Ej.: <em>devs</em>, <em>qa</em>, <em>juanp</em>.</div>
+      </section>
+
+      <!-- SEC‑03: Validación -->
+      <section class="card" id="sec3">
+        <h2>SEC‑03 · Validación y verificación</h2>
+        <div class="term">
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tip">Validación</span></div>
+<pre><code><span class="prompt">$</span> id juanp
+<span class="prompt">$</span> getent group devs
+<span class="prompt">$</span> cat /etc/passwd    # usuarios (uno por línea)
+<span class="prompt">$</span> cat /etc/group     # grupos y miembros
+<span class="prompt">$</span> grep '^juanp:' /etc/passwd   # filtro rápido
+<span class="prompt">$</span> grep '^devs:'  /etc/group
+</code></pre>
+        </div>
+        <p class="tip">Mensajes claros tras cada acción: <em>“✓ creado”</em>, <em>“✗ ya existe”</em>, <em>“entrada inválida”</em>.</p>
+      </section>
+
+      <!-- SEC‑04: Flujo -->
+      <section class="card" id="sec4">
+        <h2>SEC‑04 · Flujo sugerido (pseudocódigo)</h2>
+        <div class="term">
+          <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="tip">Diseño</span></div>
+<pre><code>leer opción
+case opción
+  1) pedir nombre de grupo -> si vacío: avisar -> crear -> informar -> (opcional) getent
+  2) pedir nombre de usuario -> si vacío: avisar -> crear -m -> informar -> (opcional) id
+  3) salir con mensaje amable
+  *) inválida -> ayuda breve y volver al menú
+esac
+</code></pre>
+        </div>
+      </section>
+
+      <!-- SEC‑05: Errores comunes -->
+      <section class="card" id="sec5">
+        <h2>SEC‑05 · Errores comunes</h2>
+        <ul>
+          <li>Olvidar <code>;;</code> al final de una rama → <em>syntax error</em>.</li>
+          <li>No cerrar con <code>esac</code>.</li>
+          <li>Crear algo que ya existe → informar y continuar (no te caigas).</li>
+          <li>Mayúsculas/espacios en nombres → evitá problemas futuros.</li>
+        </ul>
+      </section>
+
+      <!-- SEC‑06: Checklist -->
+      <section class="card" id="sec6">
+        <h2>SEC‑06 · Checklist exprés</h2>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px">
+          <ul>
+            <li>[ ] Menú con todas las opciones.</li>
+            <li>[ ] Pide lo mínimo necesario y confirma.</li>
+          </ul>
+          <ul>
+            <li>[ ] Maneja opción inválida con <code>*</code>.</li>
+            <li>[ ] Validación con <code>id</code> / <code>getent</code> / <code>cat</code>.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- SEC‑07: Glosario -->
+      <section class="card" id="sec7">
+        <h2>SEC‑07 · Glosario mini</h2>
+        <ul class="tip">
+          <li><strong>case</strong>: selector por patrones (cierra con <code>esac</code>).</li>
+          <li><strong>groupadd</strong>: crea grupos del sistema.</li>
+          <li><strong>useradd -m</strong>: crea usuario con home.</li>
+          <li><strong>usermod -aG</strong>: suma a grupo(s) sin reemplazar.</li>
+          <li><strong>id</strong>: info de usuario (UID/GID, grupos).</li>
+          <li><strong>getent group</strong>: consulta grupos y miembros.</li>
+          <li><strong>/etc/passwd</strong> y <strong>/etc/group</strong>: bases de usuarios/grupos.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>© GameForge Ops — Hoja de ayuda didáctica. Profesor Eros Sosa · UTU ISBO — 2025</footer>
+  </div>
+<script>
+  document.getElementById('btnPrint').addEventListener('click', ()=> window.print());
+</script>
+</body>
+</html>
