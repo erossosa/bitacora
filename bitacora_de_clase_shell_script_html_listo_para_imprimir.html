@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bitácora de Clase – Shell Script</title>
+  <style>
+    :root{
+      --bg:#0e1116;         /* fondo oscuro estilo terminal */
+      --panel:#11151b;
+      --ink:#e5e7eb;        /* texto principal */
+      --muted:#9aa1aa;      /* texto secundario */
+      --accent:#00d084;     /* verde semáforo / Linux vibe */
+      --warn:#f59e0b;       /* amarillo */
+      --danger:#ef4444;     /* rojo */
+      --card:#0b0e13;
+      --border:#232a34;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 800px at 20% -10%, #19202a 0%, var(--bg) 45%) no-repeat fixed;
+      color:var(--ink);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    .wrap{max-width:980px;margin:32px auto;padding:0 16px}
+    header{
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:20px 20px 12px;
+      position:sticky;top:12px;backdrop-filter: blur(4px);
+    }
+    .title{display:flex;gap:14px;align-items:center}
+    .prompt{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color:#a7ffcf;background:rgba(0, 208, 132, .08);
+      border:1px dashed #164e3b; padding:8px 10px;border-radius:12px;
+    }
+    h1{font-size:22px;margin:0 0 2px 0}
+    .sub{color:var(--muted);font-size:13px;margin-top:2px}
+
+    .grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:18px}
+    @media (min-width: 840px){ .grid{grid-template-columns: 1fr 1fr} }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+      border:1px solid var(--border);
+      border-radius:18px; padding:16px; box-shadow:var(--shadow)
+    }
+    .card h2{font-size:16px;margin:0 0 10px}
+    label{display:block;font-size:12px;color:var(--muted);margin:8px 0 6px}
+    input[type="text"], input[type="date"], textarea{
+      width:100%; background:var(--card); color:var(--ink); border:1px solid #263141;
+      border-radius:12px; padding:10px 12px; outline:none; box-shadow: inset 0 0 0 1px rgba(255,255,255,0);
+    }
+    textarea{min-height:120px; resize:vertical}
+
+    .row{display:flex;gap:10px}
+    .row > *{flex:1}
+
+    .radio-line{display:flex;gap:10px;flex-wrap:wrap}
+    .chip{appearance:none; border:1px solid var(--border); background:var(--card); color:var(--ink);
+      padding:8px 12px; border-radius:999px; cursor:pointer; font-size:13px}
+    .chip[data-color="g"]:checked{background:var(--accent)}
+    .chip[data-color="y"]:checked{background:var(--warn)}
+    .chip[data-color="r"]:checked{background:var(--danger)}
+
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    button{
+      background:var(--accent); color:#001e12; border:0; padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer
+    }
+    .ghost{background:transparent; color:var(--ink); border:1px solid var(--border)}
+    .danger{background:var(--danger); color:white}
+    .muted{color:var(--muted); font-size:12px}
+
+    footer{margin:18px 0; color:var(--muted); font-size:12px}
+
+    /* Print styles for PDF */
+    @media print{
+      header{position:static; box-shadow:none}
+      .toolbar{display:none}
+      body{background:white}
+      .card{break-inside: avoid}
+      a{color:black}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M4 5h16M4 12h16M4 19h16" stroke="#a7ffcf" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h1>Bitácora de Clase – Shell Script (menú <code>case</code>)</h1>
+          <div class="sub">2°MM · Sistemas Operativos · Unidad 6 – Automatización con Bash</div>
+        </div>
+      </div>
+      <div class="grid" style="margin-top:10px">
+        <div class="card">
+          <div class="row">
+            <div>
+              <label>Apellido y nombre</label>
+              <input id="alumno" type="text" placeholder="Pérez, Ana" autocomplete="name" />
+            </div>
+            <div>
+              <label>Equipo / Rol</label>
+              <input id="equipo" type="text" placeholder="Equipo 3 – Verificador" />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label>Fecha</label>
+              <input id="fecha" type="date" />
+            </div>
+            <div>
+              <label>Actividad</label>
+              <input id="actividad" type="text" placeholder="Menú case: crear usuario/grupo" />
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="prompt">$ Hoy registramos la solución, los comandos utilizados, la evidencia y una breve autoevaluación.</div>
+          <div style="margin-top:10px" class="toolbar">
+            <button id="btn-guardar" title="Guarda en este navegador">Guardar</button>
+            <button id="btn-pdf" class="ghost" title="Imprime / exporta a PDF">Descargar PDF</button>
+            <button id="btn-limpiar" class="danger" title="Borra esta bitácora">Borrar</button>
+            <span id="status" class="muted">—</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main style="margin-top:16px">
+      <section class="grid">
+        <article class="card">
+          <h2>1) Solución (explicá qué hace tu script)</h2>
+          <textarea id="solucion" placeholder="Describí brevemente la idea del menú y qué opciones implementaste..."></textarea>
+        </article>
+        <article class="card">
+          <h2>2) Comandos usados</h2>
+          <textarea id="comandos" placeholder="Ej.: groupadd devs, useradd -m carla, usermod -aG devs carla, id carla, getent group devs"></textarea>
+        </article>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>3) Evidencia (salidas de terminal / pruebas)</h2>
+          <textarea id="evidencia" placeholder="Copiá/pegá salidas o describí lo observado. Ej.: 'id carla' mostró UID y el grupo 'devs'."></textarea>
+        </article>
+        <article class="card">
+          <h2>4) Dificultades y cómo las resolvimos</h2>
+          <textarea id="dificultades" placeholder="¿Qué problemas aparecieron? ¿Qué hiciste para resolverlos? ¿Quién ayudó?"></textarea>
+        </article>
+      </section>
+
+      <section class="card" style="margin-top:14px">
+        <h2>5) Mini autoevaluación (semáforo)</h2>
+        <label>Comprendí cómo funciona <code>case</code> en Bash</label>
+        <div class="radio-line">
+          <label><input class="chip" type="radio" name="auto_case" value="verde" data-color="g"> Verde</label>
+          <label><input class="chip" type="radio" name="auto_case" value="amarillo" data-color="y"> Amarillo</label>
+          <label><input class="chip" type="radio" name="auto_case" value="rojo" data-color="r"> Rojo</label>
+        </div>
+        <label>Aporté al trabajo del equipo</label>
+        <div class="radio-line">
+          <label><input class="chip" type="radio" name="auto_equipo" value="verde" data-color="g"> Verde</label>
+          <label><input class="chip" type="radio" name="auto_equipo" value="amarillo" data-color="y"> Amarillo</label>
+          <label><input class="chip" type="radio" name="auto_equipo" value="rojo" data-color="r"> Rojo</label>
+        </div>
+        <label>Validé resultados con <code>id</code> / <code>getent group</code></label>
+        <div class="radio-line">
+          <label><input class="chip" type="radio" name="auto_valid" value="verde" data-color="g"> Verde</label>
+          <label><input class="chip" type="radio" name="auto_valid" value="amarillo" data-color="y"> Amarillo</label>
+          <label><input class="chip" type="radio" name="auto_valid" value="rojo" data-color="r"> Rojo</label>
+        </div>
+        <label>Comentario final (1–2 oraciones)</label>
+        <textarea id="comentario" placeholder="¿Qué aprendiste hoy? ¿Qué te quedó por practicar?"></textarea>
+      </section>
+
+      <footer>
+        <div>Esta bitácora guarda automáticamente en tu navegador (localStorage). Para entregar: hacé clic en <strong>Descargar PDF</strong>.</div>
+        <div id="savedAt" class="muted"></div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // —— Utilidades ——
+    const $ = (id)=> document.getElementById(id);
+    const inputs = {
+      alumno: $('alumno'), equipo: $('equipo'), fecha: $('fecha'), actividad: $('actividad'),
+      solucion: $('solucion'), comandos: $('comandos'), evidencia: $('evidencia'),
+      dificultades: $('dificultades'), comentario: $('comentario')
+    };
+    const radioNames = ['auto_case','auto_equipo','auto_valid'];
+    const KEY = 'bitacora_shell_case_v1';
+
+    function currentData(){
+      const data = Object.fromEntries(Object.entries(inputs).map(([k,el])=>[k, el.value]));
+      radioNames.forEach(name=>{
+        const checked = document.querySelector(`input[name="${name}"]:checked`);
+        data[name] = checked? checked.value : '';
+      });
+      return data;
+    }
+
+    function fillForm(data){
+      if(!data) return;
+      Object.entries(inputs).forEach(([k,el])=>{ if(data[k]!==undefined) el.value = data[k] });
+      radioNames.forEach(name=>{
+        if(data[name]){
+          const el = document.querySelector(`input[name="${name}"][value="${data[name]}"]`);
+          if(el) el.checked = true;
+        }
+      });
+    }
+
+    function save(manual=false){
+      const data = currentData();
+      localStorage.setItem(KEY, JSON.stringify({ data, ts: Date.now() }));
+      const t = new Date();
+      $('savedAt').textContent = `Último guardado: ${t.toLocaleString()}`;
+      if(manual){
+        const s = $('status'); s.textContent = 'Guardado en este navegador ✓'; setTimeout(()=> s.textContent='—', 1800);
+      }
+    }
+
+    function restore(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        if(!raw) return;
+        const {data, ts} = JSON.parse(raw);
+        fillForm(data);
+        if(ts){ $('savedAt').textContent = `Último guardado: ${new Date(ts).toLocaleString()}`; }
+      }catch(e){ console.warn('No se pudo restaurar', e); }
+    }
+
+    function clearAll(){
+      if(!confirm('¿Borrar esta bitácora?')) return;
+      Object.values(inputs).forEach(el=> el.value='');
+      document.querySelectorAll('input[type=radio]').forEach(r=> r.checked=false);
+      localStorage.removeItem(KEY);
+      $('savedAt').textContent='';
+    }
+
+    // —— Eventos ——
+    let timer;
+    document.addEventListener('input', ()=>{
+      clearTimeout(timer);
+      timer = setTimeout(()=> save(false), 600); // autosave con debounce
+    });
+
+    $('btn-guardar').addEventListener('click', ()=> save(true));
+    $('btn-limpiar').addEventListener('click', clearAll);
+    $('btn-pdf').addEventListener('click', ()=> window.print());
+
+    // Restaurar al abrir
+    restore();
+
+    // Precarga fecha si está vacío
+    if(!inputs.fecha.value){
+      const d = new Date();
+      const iso = d.toISOString().slice(0,10);
+      inputs.fecha.value = iso;
+    }
+  </script>
+</body>
+</html>
